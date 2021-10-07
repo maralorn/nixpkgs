@@ -5,7 +5,7 @@
  */
 let
 
-  inherit (import ./fixed-points.nix {}) makeExtensible;
+  inherit (import ./fixed-points.nix { inherit lib; }) makeExtensible;
 
   lib = makeExtensible (self: let
     callLibs = file: import file { lib = self; };
@@ -68,7 +68,7 @@ let
       bitNot boolToString mergeAttrs flip mapNullable inNixShell min max
       importJSON warn info showWarnings nixpkgsVersion version mod compare
       splitByAndCompare functionArgs setFunctionArgs isFunction toHexString toBaseDigits;
-    inherit (fixedPoints) fix fix' converge extends composeExtensions
+    inherit (fixedPoints) fix fix' converge extends composeExtensions composeManyExtensions
       makeExtensible makeExtensibleWithCustomName;
     inherit (attrsets) attrByPath hasAttrByPath setAttrByPath
       getAttrFromPath attrVals attrValues getAttrs catAttrs filterAttrs
