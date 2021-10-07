@@ -1,5 +1,5 @@
 { lib, stdenv, ghc, llvmPackages, packages, symlinkJoin, makeWrapper
-, withLLVM ? false
+, withLLVM ? !(stdenv.hostPlatform.isx86_64 || stdenv.hostPlatform.isPowerPC)
 , postBuild ? ""
 , ghcLibdir ? null # only used by ghcjs, when resolving plugins
 }:
@@ -57,9 +57,8 @@ symlinkJoin {
   # as a dedicated drv attribute, like `compiler-name`
   name = ghc.name + "-with-packages";
   paths = paths ++ [ghc];
+  nativeBuildInputs = [ makeWrapper ];
   postBuild = ''
-    . ${makeWrapper}/nix-support/setup-hook
-
     # wrap compiler executables with correct env variables
 
     for prg in ${ghcCommand} ${ghcCommand}i ${ghcCommand}-${ghc.version} ${ghcCommand}i-${ghc.version}; do
@@ -104,18 +103,6 @@ symlinkJoin {
         --add-flags '"-B$NIX_${ghcCommandCaps}_LIBDIR"'  \
         --set "NIX_${ghcCommandCaps}_LIBDIR" "${libDir}"
     fi
-
-    # ghcide 0.2.0 does package discovery without calling our ghc wrapper.
-    # 2020-08-16 We can most likely remove this workaround as soon as we build ghcide with a newer hie-bios (currently we use 0.5.1 from stack)
-    for prg in ghcide; do
-      if [[ -x "$out/bin/$prg" ]]; then
-        wrapProgram $out/bin/$prg  \
-          --set "NIX_${ghcCommandCaps}"        "$out/bin/${ghcCommand}"     \
-          --set "NIX_${ghcCommandCaps}PKG"     "$out/bin/${ghcCommand}-pkg" \
-          --set "NIX_${ghcCommandCaps}_DOCDIR" "${docDir}"                  \
-          --set "NIX_${ghcCommandCaps}_LIBDIR" "${libDir}"
-      fi
-    done
 
   '' + (lib.optionalString (stdenv.targetPlatform.isDarwin && !isGhcjs && !stdenv.targetPlatform.isiOS) ''
     # Work around a linker limit in macOS Sierra (see generic-builder.nix):
