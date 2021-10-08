@@ -2035,4 +2035,6 @@ EOT
     network = self.network_3_1_2_2;
   });
 
+  hls-pragmas-plugin = dontCheck super.hls-pragmas-plugin;
+
 } // import ./configuration-tensorflow.nix {inherit pkgs haskellLib;} self super
