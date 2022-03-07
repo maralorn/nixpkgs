@@ -2,15 +2,18 @@
 , cassava, directory, HUnit, mtl, nix-derivation, process, relude, lib
 , stm, terminal-size, text, time, unix, wcwidth, fetchFromGitHub
 , lock-file, data-default, expect, runtimeShell
+, MemoTrie, extra, generic-optics, optics, random, safe, streamly
 }:
-mkDerivation rec {
+let
+  commit = "1741ad7a";
+in mkDerivation rec {
   pname = "nix-output-monitor";
-  version = "1.0.5.0";
+  version = "unstable-${commit}";
   src = fetchFromGitHub {
     owner = "maralorn";
     repo = "nix-output-monitor";
-    hash = "sha256-7vjGE/MfRlFplGQBkhYwqMWjiFfky7J9aI8Tt5FycBo=";
-    rev = "v${version}";
+    hash = "sha256-n7Fn1x3HFTuXM9JDeQjZfB9RKEqCMKvcIRGJdKzBWJc=";
+    rev = "${commit}";
   };
   isLibrary = true;
   isExecutable = true;
@@ -18,6 +21,7 @@ mkDerivation rec {
     ansi-terminal async attoparsec base cassava containers directory mtl
     nix-derivation relude stm terminal-size text time unix wcwidth lock-file
     data-default
+    MemoTrie extra generic-optics optics random safe streamly
   ];
   executableHaskellDepends = [
     ansi-terminal async attoparsec base containers directory mtl
