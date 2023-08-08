@@ -238,6 +238,23 @@ self: super: {
   # 2023-07-17: Outdated base bound https://github.com/srid/lvar/issues/5
   lvar = doJailbreak super.lvar;
 
+  pandoc-link-context = doJailbreak super.pandoc-link-context;
+
+  ixset-typed = doJailbreak super.ixset-typed;
+
+  tagtree = doJailbreak super.tagtree;
+
+  unionmount = lib.pipe super.unionmount [
+      (appendPatch (fetchpatch {
+        url = "https://github.com/srid/unionmount/compare/27584567d9182c12018f988db899593a896f86ff...5fef2d328b5c15b9feec7ca0dd71d2d403c39941.patch";
+        sha256 = "sha256-vuvLfw2pFvqkAAHTR5toxT8wGrux7ogXVzBx3JN9jFI=";
+        includes = [ "src/*" "*.cabal" ];
+        }))
+      doJailbreak
+    ];
+
+  tailwind = doJailbreak super.tailwind;
+
   # This used to be a core package provided by GHC, but then the compiler
   # dropped it. We define the name here to make sure that old packages which
   # depend on this library still evaluate (even though they won't compile
@@ -1026,6 +1043,13 @@ self: super: {
 
   # Has a dependency on outdated versions of directory.
   cautious-file = doJailbreak (dontCheck super.cautious-file);
+
+  # Fix for newest pandoc-types not yet released: https://github.com/srid/heist-extra/issues/5
+  heist-extra = appendPatch (fetchpatch {
+    url = "https://github.com/srid/heist-extra/commit/a73aab956430dabcb86381605118a3cbc7584174.patch";
+    sha256 = "sha256-Kp6CRPm5QoNka96+Z7E/3CZbtoi0gGsHDWvU9wqCwMU=";
+    includes = [ "src/Heist/Extra/Splices/Pandoc/Render.hs" ];
+    }) super.heist-extra;
 
   # missing dependencies: blaze-html >=0.5 && <0.9, blaze-markup >=0.5 && <0.8
   digestive-functors-blaze = doJailbreak super.digestive-functors-blaze;
@@ -2662,10 +2686,6 @@ self: super: {
 
   # multiple bounds too strict
   snaplet-sqlite-simple = doJailbreak super.snaplet-sqlite-simple;
-
-  emanote = super.emanote.overrideScope (lself: lsuper: {
-    commonmark-extensions = lself.commonmark-extensions_0_2_3_2;
-  });
 
   # Test files missing from sdist
   # https://github.com/tweag/webauthn/issues/166
